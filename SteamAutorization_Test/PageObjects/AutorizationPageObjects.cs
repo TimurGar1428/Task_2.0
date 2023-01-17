@@ -23,22 +23,23 @@ namespace SteamAutorization_Test.PageObjects
             By.XPath("//*[@id=\"responsive_page_template_content\"]/div/div[1]/div/div/div/div[2]/div/form/div[4]/button/div/div");
 
 
-        public AutorizationPageObjects(IWebDriver webdriver)
-        {
-            _webdriver = webdriver;
-        }
+        //public AutorizationPageObjects(IWebDriver webdriver)
+        //{
+        //    _webdriver = webdriver;
+        //}
 
-        public MainMenyPageObject Login(string login, string password)
-        {
-            _webdriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
-            _webdriver.FindElement(_loginInputBatton).SendKeys(login);            
+        //public MainMenyPageObject Login(string login, string password)
+        //{
+        //    _webdriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+        //    _webdriver.FindElement(_loginInputBatton).SendKeys(login);            
 
-            _webdriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
-            _webdriver.FindElement(_passwordInputButton).SendKeys(password);
-            _webdriver.FindElement(_continueButton).Click();
+        //    _webdriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+        //    _webdriver.FindElement(_passwordInputButton).SendKeys(password);
+        //    _webdriver.FindElement(_continueButton).Click();
 
-            return new MainMenyPageObject(_webdriver);
+        //    return new MainMenyPageObject(_webdriver);
 
-        }
+        //}
     }
 }
+

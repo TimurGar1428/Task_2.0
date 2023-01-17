@@ -9,30 +9,31 @@ namespace SteamAutorization_Test.PageObjects
 {
     internal class MainMenyPageObject
     {
-        private IWebDriver _webDriver;
+        WebDriver driver = (WebDriver)Singleton.getInstance();
         private readonly By _signInButton =
             By.XPath("//*[@id=\"global_action_menu\"]/a");
         private readonly By _confPolitic =
             By.XPath("//*[@id=\"footer_text\"]/div[2]/a[1]");
 
-        public MainMenyPageObject(IWebDriver webDriver)
-        {
-            _webDriver = webDriver;
-        }
+        //public MainMenyPageObject(IWebDriver webDriver)
+        //{
+        //    _webDriver = webDriver;
+        //}
         /// 
-        public AutorizationPageObjects SignIn()
-        {
-            _webDriver.FindElement(_signInButton).Click();
+        //public AutorizationPageObjects SignIn()
+        //{
+        //    driver.FindElement(_signInButton).Click();
 
-            return new AutorizationPageObjects(_webDriver);
-        }
+        //    return new AutorizationPageObjects(driver);
+        //}
        
         ///
         public ConfPoliticPageObject openConfPolit()
         {
-            _webDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
-            _webDriver.FindElement(_confPolitic).Click();
-            return new ConfPoliticPageObject(_webDriver);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+            driver.FindElement(_confPolitic).Click();
+            
+            return new ConfPoliticPageObject(driver);
 
         }
     }
