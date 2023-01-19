@@ -11,60 +11,63 @@ using System.Xml.Linq;
 
 namespace SteamAutorization_Test
 {
-
+ 
     public class BaseTests
     {
-        protected IWebDriver driver;
+        //protected IWebDriver driver;
+        WebDriver driver = (WebDriver)Singleton.getInstance();
         [OneTimeSetUp]
         protected void DoBeforeAllTests()
         {
            // driver = new ChromeDriver();
         }
         private readonly By _language = By.XPath("//div[@id='languages']");
+        private readonly By _dataRu = By.XPath("//*[@id=\"newsColumn\"]/i[3]");
+        private readonly By _data = By.XPath("//*[@id=\"newsColumn\"]/i[3]");
 
         [SetUp]
         public void Setup()
         {
             
-            ChromeOptions chromeOptions = new ChromeOptions();
-            chromeOptions.AddArgument("--incognito");
-            driver= new ChromeDriver(chromeOptions);
-            driver.Navigate().GoToUrl("https://store.steampowered.com");
-            driver.Manage().Window.Maximize();
-
+            
         }
 
         [Test]
         public void Test1()
         {
-           // var mainMenu = new MainMenyPageObject(driver);
-           // mainMenu
-             //    .SignIn()
-            ///     .Login(UserNameForTests.StartLogin, UserNameForTests.StartLoginPassword);
-
-            //Assert.IsNotNull(login, "login is null");
-            // Assert.IsNotNull(password, "pasword is null");
-            // 
-            var PolitInfo = new MainMenyPageObject(driver);
+         
+            string originalWindow = driver.CurrentWindowHandle;
+            var PolitInfo = new MainMenyPageObject();
             PolitInfo
-                .openConfPolit()
-                .ConfPolitCheck();
+                .openConfPolit();
             
+           
+
+            
+            foreach (string window in driver.WindowHandles)
+            {
+                if (originalWindow != window)
+                {
+                    driver.SwitchTo().Window(window);
+                    break;
+                }
+            }
             var visibilityError = driver.FindElement(_language);
-            Assert.IsNull(visibilityError, "Активные элементы переключения языка не видны");
+            Assert.IsNotNull(visibilityError, "Активные элементы переключения языка не видны");
 
-            // var visibilitySpiner = driver.FindElement(AutorizationPageObjects._spinerAction);
-            // Assert.IsNotNull(visibilitySpiner, "Loading element is not displayed");
 
-            //data correctness check
-            //var visibilityError = driver.FindElement(_errMassege);
-            // Assert.IsNull(visibilityError, "incorrect login or password data");
+            String text = driver.FindElement(_dataRu).Text;
+            Console.WriteLine(text);
 
+            object actual = text;
+            object expected = "Дата редакции: 1 января 2023 г."; 
+            Assert.AreEqual(expected, actual, "неверная дата подписания");
+           
         }
         [TearDown]
         public void TernDown()
         {
-          //  driver.Quit();
+           driver.Quit();
         }
     }
 }
