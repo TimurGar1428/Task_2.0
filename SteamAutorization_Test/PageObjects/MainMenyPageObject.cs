@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,30 +10,41 @@ namespace SteamAutorization_Test.PageObjects
 {
     internal class MainMenyPageObject
     {
-        private IWebDriver _webDriver;
+        WebDriver driver = (WebDriver)Singleton.getInstance();
         private readonly By _signInButton =
             By.XPath("//*[@id=\"global_action_menu\"]/a");
         private readonly By _confPolitic =
             By.XPath("//*[@id=\"footer_text\"]/div[2]/a[1]");
+        private readonly By _serchTerm = 
+            By.XPath("//*[@id=\"store_nav_search_term\"]");
+        private readonly By _serchButton =
+            By.XPath("//*[@id=\"store_search_link\"]/img");
 
-        public MainMenyPageObject(IWebDriver webDriver)
+        public GameSerchPageObject gameSerch()
         {
-            _webDriver = webDriver;
-        }
-        /// 
-        public AutorizationPageObjects SignIn()
-        {
-            _webDriver.FindElement(_signInButton).Click();
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+            driver.FindElement(_serchTerm).SendKeys("Dota2"); // подтягивать из тест даты
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+            driver.FindElement(_serchButton).Click();
 
-            return new AutorizationPageObjects(_webDriver);
+            return new GameSerchPageObject();
+            // я завис на моменте сериализации таблицы в json
+            // но я разберусь и доделаю
+
+
         }
-       
         ///
         public ConfPoliticPageObject openConfPolit()
         {
-            _webDriver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
-            _webDriver.FindElement(_confPolitic).Click();
-            return new ConfPoliticPageObject(_webDriver);
+            IWebElement iframe = driver.FindElement(_confPolitic);
+            new Actions(driver)
+                .ScrollToElement(iframe)
+                .Perform();
+
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+            driver.FindElement(_confPolitic).Click();
+            
+            return new ConfPoliticPageObject(); //driver
 
         }
     }

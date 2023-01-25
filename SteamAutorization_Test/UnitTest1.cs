@@ -11,60 +11,64 @@ using System.Xml.Linq;
 
 namespace SteamAutorization_Test
 {
-
+ 
     public class BaseTests
-    {
-        protected IWebDriver driver;
-        [OneTimeSetUp]
-        protected void DoBeforeAllTests()
-        {
-           // driver = new ChromeDriver();
-        }
-        private readonly By _language = By.XPath("//div[@id='languages']");
-
+    {       
+        WebDriver driver = (WebDriver)Singleton.getInstance();      
         [SetUp]
         public void Setup()
-        {
+        {            
             
-            ChromeOptions chromeOptions = new ChromeOptions();
-            chromeOptions.AddArgument("--incognito");
-            driver= new ChromeDriver(chromeOptions);
-            driver.Navigate().GoToUrl("https://store.steampowered.com");
-            driver.Manage().Window.Maximize();
-
         }
 
         [Test]
-        public void Test1()
+        public void Test_PrivacyPolicy()
+        {         
+            string originalWindow = driver.CurrentWindowHandle;
+            var PolitInfo = new MainMenyPageObject();
+            PolitInfo.openConfPolit();  //переход на страницу политики           
+           
+            foreach (string window in driver.WindowHandles) //перевод драйвера на новую страницу
+            {
+                if (originalWindow != window)
+                {
+                    driver.SwitchTo().Window(window);
+                    break;
+                }
+            }
+            var checData = new StringRedaktor();
+            checData.ConfPolitCheck();// проверка видимости элементов и корректности даты
+            Assert.IsTrue(checData.ConfPolitCheck(), "Неверная дата подписания политики конфиденциальности");
+
+            var CheckLang = new ConfPoliticPageObject();
+            CheckLang.langCheck();//чек работоспособности элементов 
+            driver.SwitchTo().Window(originalWindow);
+        }
+        [Test]
+        public void TestGameSearch()
         {
-           // var mainMenu = new MainMenyPageObject(driver);
-           // mainMenu
-             //    .SignIn()
-            ///     .Login(UserNameForTests.StartLogin, UserNameForTests.StartLoginPassword);
+            string originalWindow = driver.CurrentWindowHandle;
+            var GameSerch = new MainMenyPageObject();
+            GameSerch.gameSerch();
 
-            //Assert.IsNotNull(login, "login is null");
-            // Assert.IsNotNull(password, "pasword is null");
-            // 
-            var PolitInfo = new MainMenyPageObject(driver);
-            PolitInfo
-                .openConfPolit()
-                .ConfPolitCheck();
-            
-            var visibilityError = driver.FindElement(_language);
-            Assert.IsNull(visibilityError, "Активные элементы переключения языка не видны");
+            foreach (string window in driver.WindowHandles) //перевод драйвера на новую страницу
+            {
+                if (originalWindow != window)
+                {
+                    driver.SwitchTo().Window(window);
+                    break;
+                }
+            }
 
-            // var visibilitySpiner = driver.FindElement(AutorizationPageObjects._spinerAction);
-            // Assert.IsNotNull(visibilitySpiner, "Loading element is not displayed");
-
-            //data correctness check
-            //var visibilityError = driver.FindElement(_errMassege);
-            // Assert.IsNull(visibilityError, "incorrect login or password data");
+            EnviromentConstantWriter enviromentConstantWriter= new EnviromentConstantWriter();
+            enviromentConstantWriter.WriteDown();
 
         }
+
         [TearDown]
         public void TernDown()
         {
-          //  driver.Quit();
+          driver.Quit();
         }
     }
 }
