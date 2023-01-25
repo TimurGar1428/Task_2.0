@@ -13,38 +13,22 @@ namespace SteamAutorization_Test
 {
  
     public class BaseTests
-    {
-        //protected IWebDriver driver;
-        WebDriver driver = (WebDriver)Singleton.getInstance();
-        [OneTimeSetUp]
-        protected void DoBeforeAllTests()
-        {
-           // driver = new ChromeDriver();
-        }
-        private readonly By _language = By.XPath("//div[@id='languages']");
-        private readonly By _dataRu = By.XPath("//*[@id=\"newsColumn\"]/i[3]");
-        private readonly By _data = By.XPath("//*[@id=\"newsColumn\"]/i[3]");
-
+    {       
+        WebDriver driver = (WebDriver)Singleton.getInstance();      
         [SetUp]
         public void Setup()
-        {
-            
+        {            
             
         }
 
         [Test]
-        public void Test1()
-        {
-         
+        public void Test_PrivacyPolicy()
+        {         
             string originalWindow = driver.CurrentWindowHandle;
             var PolitInfo = new MainMenyPageObject();
-            PolitInfo
-                .openConfPolit();
-            
+            PolitInfo.openConfPolit();  //переход на страницу политики           
            
-
-            
-            foreach (string window in driver.WindowHandles)
+            foreach (string window in driver.WindowHandles) //перевод драйвера на новую страницу
             {
                 if (originalWindow != window)
                 {
@@ -52,22 +36,39 @@ namespace SteamAutorization_Test
                     break;
                 }
             }
-            var visibilityError = driver.FindElement(_language);
-            Assert.IsNotNull(visibilityError, "Активные элементы переключения языка не видны");
+            var checData = new StringRedaktor();
+            checData.ConfPolitCheck();// проверка видимости элементов и корректности даты
+            Assert.IsTrue(checData.ConfPolitCheck(), "Неверная дата подписания политики конфиденциальности");
 
-
-            String text = driver.FindElement(_dataRu).Text;
-            Console.WriteLine(text);
-
-            object actual = text;
-            object expected = "Дата редакции: 1 января 2023 г."; 
-            Assert.AreEqual(expected, actual, "неверная дата подписания");
-           
+            var CheckLang = new ConfPoliticPageObject();
+            CheckLang.langCheck();//чек работоспособности элементов 
+            driver.SwitchTo().Window(originalWindow);
         }
+        [Test]
+        public void TestGameSearch()
+        {
+            string originalWindow = driver.CurrentWindowHandle;
+            var GameSerch = new MainMenyPageObject();
+            GameSerch.gameSerch();
+
+            foreach (string window in driver.WindowHandles) //перевод драйвера на новую страницу
+            {
+                if (originalWindow != window)
+                {
+                    driver.SwitchTo().Window(window);
+                    break;
+                }
+            }
+
+            EnviromentConstantWriter enviromentConstantWriter= new EnviromentConstantWriter();
+            enviromentConstantWriter.WriteDown();
+
+        }
+
         [TearDown]
         public void TernDown()
         {
-           driver.Quit();
+          driver.Quit();
         }
     }
 }
